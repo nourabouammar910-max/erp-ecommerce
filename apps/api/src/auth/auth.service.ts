@@ -1,75 +1,209 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+
 import { UsersService } from '../users/users.service';
+import { LoginDto } from './dto/login.dto';
+
 
 @Injectable()
 export class AuthService {
+
+
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
+
+    private readonly usersService: UsersService,
+
+    private readonly jwtService: JwtService,
+
+    private readonly config: ConfigService,
+
   ) {}
 
-  async login(dto: any) {
-    const user = await this.usersService.findByEmail(dto.email);
+
+
+  async login(dto: LoginDto) {
+
+
+    const user =
+      await this.usersService.findByEmail(
+        dto.email,
+      );
+
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+
+      throw new UnauthorizedException(
+        'Invalid credentials',
+      );
+
     }
 
-    const match = await bcrypt.compare(dto.password, user.password);
 
-    if (!match) {
-      throw new UnauthorizedException('Invalid credentials');
+
+    const passwordMatch =
+      await bcrypt.compare(
+        dto.password,
+        user.password,
+      );
+
+
+
+    if (!passwordMatch) {
+
+      throw new UnauthorizedException(
+        'Invalid credentials',
+      );
+
     }
+
+
 
     const payload = {
+
       sub: user.id,
+
       email: user.email,
+
       role: user.role,
+
     };
+
+
+
+    const accessToken =
+      this.jwtService.sign(
+        payload,
+        {
+          secret:
+            this.config.getOrThrow<string>(
+              'JWT_SECRET',
+            ),
+
+          expiresIn:'15m',
+        },
+      );
+
+
+
+    const refreshToken =
+      this.jwtService.sign(
+        payload,
+        {
+          secret:
+            this.config.getOrThrow<string>(
+              'JWT_REFRESH_SECRET',
+            ),
+
+          expiresIn:'7d',
+        },
+      );
+
+
 
     return {
-      access_token: this.jwtService.sign(payload, {
-        secret: process.env.JWT_SECRET,
-        expiresIn: '15m',
-      }),
 
-      refresh_token: this.jwtService.sign(payload, {
-        secret: process.env.JWT_REFRESH_SECRET,
-        expiresIn: '7d',
-      }),
 
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
+      access_token:
+        accessToken,
+
+
+      refresh_token:
+        refreshToken,
+
+
+
+      user:{
+
+        id:user.id,
+
+        name:user.name,
+
+        email:user.email,
+
+        role:user.role,
+
       },
+
+
     };
+
+
   }
 
-  async refresh(token: string) {
+
+
+
+
+  async refresh(
+    token:string,
+  ){
+
+
     try {
-      const payload = this.jwtService.verify(token, {
-        secret: process.env.JWT_REFRESH_SECRET,
-      });
+
+
+      const payload =
+        this.jwtService.verify(
+          token,
+          {
+            secret:
+              this.config.getOrThrow<string>(
+                'JWT_REFRESH_SECRET',
+              ),
+          },
+        );
+
+
+
+      const accessToken =
+        this.jwtService.sign(
+          {
+            sub:payload.sub,
+
+            email:payload.email,
+
+            role:payload.role,
+          },
+          {
+
+            secret:
+              this.config.getOrThrow<string>(
+                'JWT_SECRET',
+              ),
+
+            expiresIn:'15m',
+
+          },
+        );
+
+
 
       return {
-        access_token: this.jwtService.sign(
-          {
-            sub: payload.sub,
-            email: payload.email,
-            role: payload.role,
-          },
-          {
-            secret: process.env.JWT_SECRET,
-            expiresIn: '15m',
-          },
-        ),
+
+        access_token:
+          accessToken,
+
       };
+
+
+
     } catch {
-      throw new UnauthorizedException('Invalid refresh token');
+
+
+      throw new UnauthorizedException(
+        'Invalid refresh token',
+      );
+
     }
+
+
   }
+
+
 }

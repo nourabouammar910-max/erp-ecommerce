@@ -1,22 +1,70 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import {
+ Controller,
+ Get,
+ Post,
+ Body,
+ Param,
+ Delete
+} from '@nestjs/common';
+
+
 import { PurchaseService } from './purchase.service';
+
+import { CreatePurchaseDto } from './dto/create-purchase.dto';
+
+
 
 @Controller('purchases')
 export class PurchaseController {
-  constructor(private readonly purchaseService: PurchaseService) {}
 
-  @Post()
-  create(@Body() dto: any) {
-    return this.purchaseService.create(dto);
-  }
 
-  @Get()
-  findAll() {
-    return this.purchaseService.findAll();
-  }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.purchaseService.findOne(id);
-  }
+constructor(
+private readonly purchaseService:PurchaseService
+){}
+
+
+
+@Get()
+findAll(){
+
+return this.purchaseService.findAll();
+
+}
+
+
+
+
+@Post()
+create(
+@Body() dto:CreatePurchaseDto
+){
+
+return this.purchaseService.create(dto);
+
+}
+
+
+
+@Get(':id')
+findOne(
+@Param('id') id:string
+){
+
+return this.purchaseService.findOne(id);
+
+}
+
+
+
+@Delete(':id')
+remove(
+@Param('id') id:string
+){
+
+return this.purchaseService.remove(id);
+
+}
+
+
 }

@@ -1,40 +1,100 @@
-import { useEffect } from "react";
-import { api } from "../../services/api";
+import { FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function LoginPage() {
-  useEffect(() => {
-    api
-      .get("/")
-      .then((res) => {
-        console.log("Backend Response:", res.data);
-      })
-      .catch((err) => {
-        console.error("Connection Error:", err);
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+
+    setError("");
+    setLoading(true);
+
+    try {
+      await login({
+        email,
+        password,
       });
-  }, []);
+
+      navigate("/dashboard");
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.message || "Login failed"
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100">
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
-        <h1 className="mb-6 text-center text-3xl font-bold">
-          ERP Ecommerce
-        </h1>
+    <div
+      style={{
+        display: "grid",
+        placeItems: "center",
+        height: "100vh",
+      }}
+    >
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          width: 350,
+          padding: 30,
+          border: "1px solid #ddd",
+          borderRadius: 10,
+        }}
+      >
+        <h2>ERP Login</h2>
 
         <input
-          className="mb-4 w-full rounded-lg border p-3"
+          type="email"
           placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={{
+            width: "100%",
+            padding: 10,
+            marginTop: 20,
+          }}
         />
 
         <input
-          className="mb-6 w-full rounded-lg border p-3"
-          placeholder="Password"
           type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={{
+            width: "100%",
+            padding: 10,
+            marginTop: 15,
+          }}
         />
 
-        <button className="w-full rounded-lg bg-blue-600 p-3 font-semibold text-white hover:bg-blue-700">
-          تسجيل الدخول
+        {error && (
+          <p style={{ color: "red" }}>
+            {error}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            width: "100%",
+            marginTop: 20,
+            padding: 10,
+          }}
+        >
+          {loading ? "Logging in..." : "Login"}
         </button>
-      </div>
+      </form>
     </div>
   );
 }

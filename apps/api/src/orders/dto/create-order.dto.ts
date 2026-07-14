@@ -1,27 +1,40 @@
-import { Type } from 'class-transformer';
 import {
+  IsString,
   IsArray,
-  IsInt,
   ValidateNested,
+  IsNumber,
 } from 'class-validator';
 
-class OrderItemDto {
-  @IsInt()
-  @Type(() => Number)
-  productId: number;
+import { Type } from 'class-transformer';
 
-  @IsInt()
-  @Type(() => Number)
-  quantity: number;
+
+export class CreateOrderItemDto {
+
+  @IsString()
+  productId!: string;
+
+
+  @IsNumber()
+  quantity!: number;
+
+
+  @IsNumber()
+  price!: number;
+
 }
 
+
+
 export class CreateOrderDto {
-  @IsInt()
-  @Type(() => Number)
-  userId: number;
+
+
+  @IsString()
+  warehouseId!: string;
+
 
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => OrderItemDto)
-  items: OrderItemDto[];
+  @Type(() => CreateOrderItemDto)
+  items!: CreateOrderItemDto[];
+
 }

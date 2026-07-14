@@ -3,38 +3,145 @@ import {
   Get,
   Post,
   Body,
-  UseGuards,
 } from '@nestjs/common';
 
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { Roles } from '../common/decorators/roles.decorator';
+import { InventoryService } from './inventory.service';
+
+
 
 @Controller('inventory')
 export class InventoryController {
 
-  // ======================
-  // GET STOCK (ADMIN ONLY)
-  // ======================
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+
+  constructor(
+    private readonly inventoryService: InventoryService
+  ) {}
+
+
+
+
+
+  // ======================================
+  // GET ALL STOCK
+  // ======================================
+
   @Get()
-  getStock() {
-    return {
-      message: 'Inventory endpoint ready (connect service next)',
-    };
+  getAll(){
+
+    return this.inventoryService.getAllStock();
+
   }
 
-  // ======================
-  // MANUAL ADJUST STOCK
-  // ======================
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
-  @Post('adjust')
-  adjustStock(@Body() body: any) {
-    return {
-      message: 'Stock adjustment endpoint ready',
-      data: body,
-    };
+
+
+
+
+  // ======================================
+  // DASHBOARD
+  // ======================================
+
+  @Get('dashboard')
+  dashboard(){
+
+    return this.inventoryService.getDashboard();
+
   }
+
+
+
+
+
+  // ======================================
+  // MOVEMENTS
+  // ======================================
+
+  @Get('movements')
+  movements(){
+
+    return this.inventoryService.getMovements();
+
+  }
+
+
+
+
+
+  // ======================================
+  // PRODUCTS
+  // ======================================
+
+  @Get('products')
+  products(){
+
+    return this.inventoryService.getProducts();
+
+  }
+
+
+
+
+
+  // ======================================
+  // WAREHOUSES
+  // ======================================
+
+  @Get('warehouses')
+  warehouses(){
+
+    return this.inventoryService.getWarehouses();
+
+  }
+
+
+
+
+
+  // ======================================
+  // ADD STOCK
+  // ======================================
+
+  @Post('add')
+  add(
+    @Body() body:any
+  ){
+
+    return this.inventoryService.addStock(body);
+
+  }
+
+
+
+
+
+  // ======================================
+  // REMOVE STOCK
+  // ======================================
+
+  @Post('remove')
+  remove(
+    @Body() body:any
+  ){
+
+    return this.inventoryService.removeStock(body);
+
+  }
+
+
+
+
+
+  // ======================================
+  // ADJUST STOCK
+  // ======================================
+
+  @Post('adjust')
+  adjust(
+    @Body() body:any
+  ){
+
+    return this.inventoryService.adjustStock(body);
+
+  }
+
+
 }

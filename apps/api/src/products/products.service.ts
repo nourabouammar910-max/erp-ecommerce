@@ -1,69 +1,114 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
+
 @Injectable()
 export class ProductsService {
-  constructor(private readonly prisma: PrismaService) {}
 
-  // ➕ Create Product
+  constructor(
+    private readonly prisma: PrismaService,
+  ) {}
+
+
+
+  // CREATE
   create(data: {
     name: string;
-    description?: string;
+    sku?: string;
     price: number;
-    stock: number;
-    categoryId: number;
+    cost?: number;
+    categoryId?: number;
   }) {
+
     return this.prisma.product.create({
+
       data,
-      include: {
-        category: true,
+
+      include:{
+        category:true,
       },
+
     });
+
   }
 
-  // 📥 Get all products
-  findAll() {
+
+
+  // GET ALL
+  findAll(){
+
     return this.prisma.product.findMany({
-      include: {
-        category: true,
+
+      include:{
+        category:true,
       },
+
     });
+
   }
 
-  // 📥 Get one product
-  findOne(id: number) {
+
+
+  // GET ONE
+  findOne(id:string){
+
     return this.prisma.product.findUnique({
-      where: { id },
-      include: {
-        category: true,
+
+      where:{
+        id,
       },
+
+      include:{
+        category:true,
+      },
+
     });
+
   }
 
-  // ✏️ Update product
+
+
+  // UPDATE
   update(
-    id: number,
-    data: {
-      name?: string;
-      description?: string;
-      price?: number;
-      stock?: number;
-      categoryId?: number;
+    id:string,
+    data:{
+      name?:string;
+      sku?:string;
+      price?:number;
+      cost?:number;
+      categoryId?:number;
     },
-  ) {
+  ){
+
     return this.prisma.product.update({
-      where: { id },
-      data,
-      include: {
-        category: true,
+
+      where:{
+        id,
       },
+
+      data,
+
+      include:{
+        category:true,
+      },
+
     });
+
   }
 
-  // ❌ Delete product
-  remove(id: number) {
+
+
+  // DELETE
+  remove(id:string){
+
     return this.prisma.product.delete({
-      where: { id },
+
+      where:{
+        id,
+      },
+
     });
+
   }
+
 }

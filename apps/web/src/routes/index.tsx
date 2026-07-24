@@ -1,10 +1,12 @@
-import { 
-  createBrowserRouter, 
-  useRouteError 
+import {
+  createBrowserRouter,
+  useRouteError,
 } from "react-router-dom";
 
 
 import LoginPage from "../pages/auth/LoginPage";
+import RegisterPage from "../pages/auth/RegisterPage";
+
 
 import DashboardLayout from "../layouts/DashboardLayout";
 import ProtectedRoute from "./ProtectedRoute";
@@ -41,15 +43,18 @@ import WarehousesPage from "../pages/warehouses/WarehousesPage";
 import CreateWarehousePage from "../pages/warehouses/CreateWarehousePage";
 import EditWarehousePage from "../pages/warehouses/EditWarehousePage";
 
+
 // Suppliers
 import SuppliersPage from "../pages/suppliers/SuppliersPage";
 import CreateSupplierPage from "../pages/suppliers/CreateSupplierPage";
 import EditSupplierPage from "../pages/suppliers/EditSupplierPage";
 
+
 // Orders
 import OrdersPage from "../pages/orders/OrdersPage";
 import CreateOrderPage from "../pages/orders/CreateOrderPage";
 import CreateOrder from "../pages/orders/CreateOrder";
+
 
 // Purchases
 import PurchasesPage from "../pages/purchases/PurchasesPage";
@@ -57,267 +62,280 @@ import PurchasesPage from "../pages/purchases/PurchasesPage";
 
 
 
-function ErrorPage() {
 
-  const error = useRouteError() as any;
+function ErrorPage(){
 
-
-  return (
-
-    <div
-      style={{
-        padding:40
-      }}
-    >
-
-      <h1>
-        Route Error
-      </h1>
+const error = useRouteError() as any;
 
 
-      <pre>
-        {
-          error?.message ||
-          JSON.stringify(
-            error,
-            null,
-            2
-          )
-        }
-      </pre>
+return(
+
+<div
+style={{
+padding:40
+}}
+>
+
+<h1>
+Route Error
+</h1>
 
 
-    </div>
+<pre>
 
-  );
+{
+error?.message ||
+JSON.stringify(
+error,
+null,
+2
+)
+}
+
+</pre>
+
+
+</div>
+
+);
+
 
 }
 
 
 
-export const router = createBrowserRouter([
 
 
-  // LOGIN
-  {
-    path:"/",
-    element:<LoginPage />,
-    errorElement:<ErrorPage />,
-  },
+export const router =
+createBrowserRouter([
 
-
-
-  // DASHBOARD LAYOUT
-  {
-    element:
-
-      <ProtectedRoute>
-
-        <DashboardLayout />
-
-      </ProtectedRoute>
-    ,
-
-
-    errorElement:<ErrorPage />,
-
-
-
-    children:[
-
-
-
-      // =================
-      // Dashboard
-      // =================
-
-      {
-        path:"dashboard",
-        element:<DashboardPage />,
-      },
-
-
-
-
-      // =================
-      // Users
-      // =================
-
-      {
-        path:"users",
-        element:<UsersPage />,
-      },
-
-
-      {
-        path:"users/create",
-        element:<CreateUserPage />,
-      },
-
-
-      {
-        path:"users/:id/edit",
-        element:<EditUserPage />,
-      },
-
-
-
-
-
-
-      // =================
-      // Products
-      // =================
-
-
-      {
-        path:"products",
-        element:<ProductsPage />,
-      },
-
-
-      {
-        path:"products/create",
-        element:<CreateProductPage />,
-      },
-
-
-      {
-        path:"products/:id/edit",
-        element:<EditProductPage />,
-      },
-
-
-
-
-
-
-
-      // =================
-      // Categories
-      // =================
-
-
-      {
-        path:"categories",
-        element:<CategoriesPage />,
-      },
-
-
-      {
-        path:"categories/create",
-        element:<CreateCategoryPage />,
-      },
-
-
-      {
-        path:"categories/:id/edit",
-        element:<EditCategoryPage />,
-      },
-
-
-
-
-
-
-      // =================
-      // Inventory
-      // =================
-
-
-      {
-        path:"inventory",
-        element:<InventoryPage />,
-      },
-
-
-
-
-
-
-      // =================
-      // Warehouses
-      // =================
-
-
-      {
-        path:"warehouses",
-        element:<WarehousesPage />,
-      },
-
-
-      {
-        path:"warehouses/create",
-        element:<CreateWarehousePage />,
-      },
-
-
-      {
-        path:"warehouses/:id/edit",
-        element:<EditWarehousePage />,
-      },
 
 
 // =================
+// LOGIN
+// =================
+
+{
+path:"/",
+element:<LoginPage />,
+errorElement:<ErrorPage />,
+},
+
+
+
+// =================
+// REGISTER
+// =================
+
+{
+path:"/register",
+element:<RegisterPage />,
+errorElement:<ErrorPage />,
+},
+
+
+
+
+
+// =================
+// DASHBOARD
+// =================
+
+{
+element:
+
+<ProtectedRoute>
+
+<DashboardLayout />
+
+</ProtectedRoute>,
+
+
+errorElement:<ErrorPage />,
+
+
+children:[
+
+
+
+// Dashboard
+
+{
+path:"dashboard",
+element:<DashboardPage />,
+},
+
+
+
+
+
+// Users
+
+{
+path:"users",
+element:<UsersPage />,
+},
+
+
+{
+path:"users/create",
+element:<CreateUserPage />,
+},
+
+
+{
+path:"users/:id/edit",
+element:<EditUserPage />,
+},
+
+
+
+
+
+// Products
+
+{
+path:"products",
+element:<ProductsPage />,
+},
+
+
+{
+path:"products/create",
+element:<CreateProductPage />,
+},
+
+
+{
+path:"products/:id/edit",
+element:<EditProductPage />,
+},
+
+
+
+
+
+// Categories
+
+{
+path:"categories",
+element:<CategoriesPage />,
+},
+
+
+{
+path:"categories/create",
+element:<CreateCategoryPage />,
+},
+
+
+{
+path:"categories/:id/edit",
+element:<EditCategoryPage />,
+},
+
+
+
+
+
+
+// Inventory
+
+{
+path:"inventory",
+element:<InventoryPage />,
+},
+
+
+
+
+
+// Warehouses
+
+{
+path:"warehouses",
+element:<WarehousesPage />,
+},
+
+
+{
+path:"warehouses/create",
+element:<CreateWarehousePage />,
+},
+
+
+{
+path:"warehouses/:id/edit",
+element:<EditWarehousePage />,
+},
+
+
+
+
+
+
 // Suppliers
-// =================
 
 {
-  path: "suppliers",
-  element: <SuppliersPage />,
-},
-
-{
-  path: "suppliers/create",
-  element: <CreateSupplierPage />,
-},
-
-{
-  path: "suppliers/:id/edit",
-  element: <EditSupplierPage />,
+path:"suppliers",
+element:<SuppliersPage />,
 },
 
 
+{
+path:"suppliers/create",
+element:<CreateSupplierPage />,
+},
 
 
-   // =================
+{
+path:"suppliers/:id/edit",
+element:<EditSupplierPage />,
+},
+
+
+
+
+
+
+
 // Orders
-// =================
 
 {
-  path:"orders",
-  element:<OrdersPage />,
-},
-
-{
-  path:"orders/create",
-  element:<CreateOrderPage />,
-},
-{
-  path:"orders/create",
-  element:<CreateOrder />,
+path:"orders",
+element:<OrdersPage />,
 },
 
 
+{
+path:"orders/create",
+element:<CreateOrderPage />,
+},
+
+
+{
+path:"orders/new",
+element:<CreateOrder />,
+},
 
 
 
 
-      // =================
-      // Purchases
-      // =================
 
 
-      {
-        path:"purchases",
-        element:<PurchasesPage />,
-      },
+// Purchases
+
+{
+path:"purchases",
+element:<PurchasesPage />,
+},
 
 
-    ],
+
+],
 
 
-  },
+},
 
 
 ]);

@@ -50,54 +50,51 @@ new QueryClient();
 
 
 
+
 ReactDOM.createRoot(
-
-document.getElementById("root")!
-
+  document.getElementById("root")!
 )
-
 .render(
 
 
-
-<ThemeProvider theme={theme}>
-
-
-<CssBaseline />
+  <React.StrictMode>
 
 
-
-<QueryClientProvider client={queryClient}>
-
-
-<AuthProvider>
+    <ThemeProvider theme={theme}>
 
 
-<RouterProvider
-
-router={router}
-
-/>
+      <CssBaseline />
 
 
 
-<Toaster
-
-position="top-right"
-
-reverseOrder={false}
-
-/>
+      <QueryClientProvider client={queryClient}>
 
 
-</AuthProvider>
+        <AuthProvider>
 
 
-</QueryClientProvider>
+          <RouterProvider
+            router={router}
+          />
 
 
-</ThemeProvider>
 
+          <Toaster
+            position="top-right"
+            reverseOrder={false}
+          />
+
+
+        </AuthProvider>
+
+
+      </QueryClientProvider>
+
+
+    </ThemeProvider>
+
+
+  </React.StrictMode>
 
 
 );

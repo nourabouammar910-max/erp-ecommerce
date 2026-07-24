@@ -30,9 +30,12 @@ import { RolesGuard } from '../common/guards/roles.guard';
 export class UsersController {
 
 
+
   constructor(
     private readonly usersService: UsersService,
   ) {}
+
+
 
 
 
@@ -41,6 +44,10 @@ export class UsersController {
   // ========================
 
   @Post()
+
+  @UseGuards(
+    JwtAuthGuard,
+  )
 
   create(
     @Body() createUserDto: CreateUserDto,
@@ -56,25 +63,30 @@ export class UsersController {
 
 
 
+
+
+
+
   // ========================
   // Get All Users
-  // ADMIN ONLY
+  // Any Logged User
   // ========================
 
   @Get()
 
   @UseGuards(
     JwtAuthGuard,
-    RolesGuard,
   )
-
-  @Roles('ADMIN')
 
   findAll(){
 
     return this.usersService.findAll();
 
   }
+
+
+
+
 
 
 
@@ -102,6 +114,10 @@ export class UsersController {
 
 
 
+
+
+
+
   // ========================
   // Get User By ID
   // ========================
@@ -121,6 +137,10 @@ export class UsersController {
     );
 
   }
+
+
+
+
 
 
 
@@ -159,6 +179,10 @@ export class UsersController {
 
 
 
+
+
+
+
   // ========================
   // Delete User
   // ADMIN ONLY
@@ -182,6 +206,7 @@ export class UsersController {
     );
 
   }
+
 
 
 }

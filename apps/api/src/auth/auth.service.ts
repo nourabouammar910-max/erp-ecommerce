@@ -3,16 +3,34 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
+
+import {
+  CreateUserDto,
+  UserRole,
+} from '../users/dto/create-user.dto';
+
+
 import { JwtService } from '@nestjs/jwt';
+
 import { ConfigService } from '@nestjs/config';
+
 import * as bcrypt from 'bcrypt';
 
-import { UsersService } from '../users/users.service';
-import { LoginDto } from './dto/login.dto';
+
+import {
+  UsersService
+} from '../users/users.service';
+
+
+import {
+  LoginDto
+} from './dto/login.dto';
+
 
 
 @Injectable()
 export class AuthService {
+
 
 
   constructor(
@@ -27,13 +45,18 @@ export class AuthService {
 
 
 
-  async login(dto: LoginDto) {
+
+
+  async login(
+    dto: LoginDto,
+  ) {
 
 
     const user =
       await this.usersService.findByEmail(
         dto.email,
       );
+
 
 
     if (!user) {
@@ -66,13 +89,18 @@ export class AuthService {
 
     const payload = {
 
-      sub: user.id,
 
-      email: user.email,
+      sub:user.id,
 
-      role: user.role,
+
+      email:user.email,
+
+
+      role:user.role,
+
 
     };
+
 
 
 
@@ -80,14 +108,18 @@ export class AuthService {
       this.jwtService.sign(
         payload,
         {
+
           secret:
             this.config.getOrThrow<string>(
               'JWT_SECRET',
             ),
 
           expiresIn:'15m',
+
         },
       );
+
+
 
 
 
@@ -95,14 +127,19 @@ export class AuthService {
       this.jwtService.sign(
         payload,
         {
+
           secret:
             this.config.getOrThrow<string>(
               'JWT_REFRESH_SECRET',
             ),
 
           expiresIn:'7d',
+
         },
       );
+
+
+
 
 
 
@@ -120,13 +157,18 @@ export class AuthService {
 
       user:{
 
+
         id:user.id,
+
 
         name:user.name,
 
+
         email:user.email,
 
+
         role:user.role,
+
 
       },
 
@@ -135,6 +177,53 @@ export class AuthService {
 
 
   }
+
+
+
+
+
+
+
+
+
+  async register(
+    dto:CreateUserDto,
+  ){
+
+
+
+    return this.usersService.create({
+
+
+
+      name:
+        dto.name,
+
+
+
+      email:
+        dto.email,
+
+
+
+      password:
+        dto.password,
+
+
+
+      role:
+        UserRole.USER,
+
+
+    });
+
+
+
+  }
+
+
+
+
 
 
 
@@ -152,42 +241,61 @@ export class AuthService {
         this.jwtService.verify(
           token,
           {
+
             secret:
               this.config.getOrThrow<string>(
                 'JWT_REFRESH_SECRET',
               ),
+
           },
         );
+
+
 
 
 
       const accessToken =
         this.jwtService.sign(
           {
-            sub:payload.sub,
 
-            email:payload.email,
+            sub:
+              payload.sub,
 
-            role:payload.role,
+
+            email:
+              payload.email,
+
+
+            role:
+              payload.role,
+
+
           },
           {
+
 
             secret:
               this.config.getOrThrow<string>(
                 'JWT_SECRET',
               ),
 
+
             expiresIn:'15m',
+
 
           },
         );
 
 
 
+
+
       return {
+
 
         access_token:
           accessToken,
+
 
       };
 
@@ -200,10 +308,12 @@ export class AuthService {
         'Invalid refresh token',
       );
 
+
     }
 
 
   }
+
 
 
 }

@@ -1,47 +1,33 @@
 import {
-  FormEvent,
-  useState,
+FormEvent,
+useState
 } from "react";
 
 
 import {
-  Link,
-  useNavigate,
+useNavigate
 } from "react-router-dom";
 
 
-import {
-  useAuth,
-} from "../../hooks/useAuth";
+import api from "../../api/axios";
 
 
 
-export default function LoginPage() {
-
+export default function RegisterPage(){
 
 
 const navigate = useNavigate();
 
 
-
-const {
-login
-}=useAuth();
-
-
-
+const [name,setName]=useState("");
 
 const [email,setEmail]=useState("");
 
 const [password,setPassword]=useState("");
 
-const [loading,setLoading]=useState(false);
-
 const [error,setError]=useState("");
 
-
-
-
+const [loading,setLoading]=useState(false);
 
 
 
@@ -52,7 +38,6 @@ e:FormEvent
 
 e.preventDefault();
 
-
 setError("");
 
 setLoading(true);
@@ -62,64 +47,27 @@ setLoading(true);
 try{
 
 
-const result =
-await login({
-
-email,
-
-password,
-
-});
-
-
-
-
-console.log(
-"LOGIN SUCCESS:",
-result.data
-);
-
-
-
-
-const token =
-localStorage.getItem(
-"access_token"
-);
-
-
-
-
-if(token){
-
-navigate(
-"/dashboard",
+await api.post(
+"/auth/register",
 {
-replace:true
+name,
+email,
+password
 }
 );
 
-}
+
+
+navigate("/");
 
 
 
-
-}
-catch(err:any){
-
-
-
-console.log(
-"LOGIN ERROR",
-err
-);
-
-
+}catch(err:any){
 
 
 setError(
 err?.response?.data?.message ||
-"Login failed"
+"Register failed"
 );
 
 
@@ -127,27 +75,17 @@ err?.response?.data?.message ||
 }
 finally{
 
-
 setLoading(false);
 
-
 }
 
 
 
 }
-
-
-
-
-
-
 
 
 
 return (
-
-
 
 <div
 
@@ -166,24 +104,21 @@ background:"#f5f7fb"
 >
 
 
-
 <form
-
 
 onSubmit={handleSubmit}
 
-
 style={{
 
-width:360,
+width:380,
 
 padding:35,
 
-background:"#fff",
+background:"white",
 
 borderRadius:15,
 
-boxShadow:"0 10px 30px rgba(0,0,0,0.12)"
+boxShadow:"0 10px 30px #ddd"
 
 }}
 
@@ -191,169 +126,112 @@ boxShadow:"0 10px 30px rgba(0,0,0,0.12)"
 
 
 
-<h2
+<h2>
 
-style={{
-
-textAlign:"center",
-
-marginBottom:10
-
-}}
-
->
-
-ERP Login
+Create Account
 
 </h2>
 
 
 
-
-<p
-
-style={{
-
-textAlign:"center",
-
-color:"#777"
-
-}}
-
->
-
-Welcome back
-
-</p>
-
-
-
-
-
 <input
 
+placeholder="Name"
 
-type="email"
-
-
-placeholder="Email"
-
-
-value={email}
-
+value={name}
 
 onChange={
-e=>setEmail(e.target.value)
+e=>setName(e.target.value)
 }
-
 
 style={{
 
 width:"100%",
 
 padding:12,
-
-marginTop:20,
-
-borderRadius:8,
-
-border:"1px solid #ccc"
-
-}}
-
-
-
-/>
-
-
-
-
-
-
-
-<input
-
-
-type="password"
-
-
-placeholder="Password"
-
-
-value={password}
-
-
-onChange={
-e=>setPassword(e.target.value)
-}
-
-
-style={{
-
-width:"100%",
-
-padding:12,
-
-marginTop:15,
-
-borderRadius:8,
-
-border:"1px solid #ccc"
-
-}}
-
-
-
-/>
-
-
-
-
-
-
-
-{
-
-error &&
-
-
-<p
-
-style={{
-
-color:"red",
 
 marginTop:15
 
 }}
 
->
+/>
 
+
+
+
+<input
+
+type="email"
+
+placeholder="Email"
+
+value={email}
+
+onChange={
+e=>setEmail(e.target.value)
+}
+
+style={{
+
+width:"100%",
+
+padding:12,
+
+marginTop:15
+
+}}
+
+/>
+
+
+
+
+<input
+
+type="password"
+
+placeholder="Password"
+
+value={password}
+
+onChange={
+e=>setPassword(e.target.value)
+}
+
+style={{
+
+width:"100%",
+
+padding:12,
+
+marginTop:15
+
+}}
+
+/>
+
+
+
+
+{
+error &&
+
+<p style={{
+color:"red"
+}}>
 
 {error}
 
-
 </p>
 
-
 }
-
-
-
-
 
 
 
 
 <button
 
-
-type="submit"
-
-
 disabled={loading}
-
-
 
 style={{
 
@@ -363,39 +241,26 @@ padding:12,
 
 marginTop:20,
 
-border:0,
-
-borderRadius:8,
-
 background:"#1976d2",
 
 color:"white",
 
-fontSize:16,
+border:0,
 
-cursor:"pointer"
+borderRadius:8
 
 }}
-
 
 >
 
 
-
 {
-
 loading
-
 ?
-
-"Logging in..."
-
+"Creating..."
 :
-
-"Login"
-
+"Create Account"
 }
-
 
 
 </button>
@@ -403,55 +268,23 @@ loading
 
 
 
-
-
-
 <p
 
 style={{
 
-textAlign:"center",
+cursor:"pointer",
 
-marginTop:25,
-
-color:"#555"
+marginTop:20
 
 }}
 
->
-
-
-New user?{" "}
-
-
-<Link
-
-to="/register"
-
-style={{
-
-color:"#1976d2",
-
-fontWeight:"bold",
-
-textDecoration:"none"
-
-}}
+onClick={()=>navigate("/")}
 
 >
 
-
-Create Account
-
-
-</Link>
-
-
+Back to Login
 
 </p>
-
-
-
 
 
 
@@ -459,9 +292,7 @@ Create Account
 
 
 
-
 </div>
-
 
 
 );

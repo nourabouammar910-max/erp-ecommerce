@@ -1,107 +1,89 @@
+import {
+  DataGrid,
+  type GridColDef,
+} from "@mui/x-data-grid";
+
+import { Chip } from "@mui/material";
+
 interface Props {
-  movements:any[];
+  movements: any[];
 }
 
-
 export default function MovementsTable({
-  movements
-}:Props){
+  movements,
+}: Props) {
+  const columns: GridColDef[] = [
+    {
+      field: "createdAt",
+      headerName: "Date",
+      flex: 1,
+      valueGetter: (_, row) =>
+        new Date(row.createdAt).toLocaleDateString(),
+    },
 
+    {
+      field: "product",
+      headerName: "Product",
+      flex: 1,
+      valueGetter: (_, row) =>
+        row.product?.name,
+    },
+
+    {
+      field: "warehouse",
+      headerName: "Warehouse",
+      flex: 1,
+      valueGetter: (_, row) =>
+        row.warehouse?.name,
+    },
+
+    {
+      field: "type",
+      headerName: "Operation",
+      width: 150,
+
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          color={
+            params.value === "ADD"
+              ? "success"
+              : params.value === "REMOVE"
+              ? "error"
+              : "warning"
+          }
+          size="small"
+        />
+      ),
+    },
+
+    {
+      field: "quantity",
+      headerName: "Quantity",
+      width: 120,
+    },
+  ];
 
   return (
-
-    <table
+    <div
       style={{
-        width:"100%",
-        borderCollapse:"collapse",
-        marginTop:20,
+        height: 500,
+        width: "100%",
       }}
     >
-
-
-      <thead>
-
-        <tr>
-
-          <th>Date</th>
-
-          <th>Product</th>
-
-          <th>Warehouse</th>
-
-          <th>Type</th>
-
-          <th>Quantity</th>
-
-        </tr>
-
-      </thead>
-
-
-
-      <tbody>
-
-
-      {
-        movements.map((item)=>(
-
-          <tr key={item.id}>
-
-
-            <td>
-
-              {
-                new Date(
-                  item.createdAt
-                ).toLocaleDateString()
-              }
-
-            </td>
-
-
-
-            <td>
-              {
-                item.product?.name
-              }
-            </td>
-
-
-
-            <td>
-              {
-                item.warehouse?.name
-              }
-            </td>
-
-
-
-            <td>
-              {
-                item.type
-              }
-            </td>
-
-
-
-            <td>
-              {
-                item.quantity
-              }
-            </td>
-
-
-          </tr>
-
-        ))
-      }
-
-
-      </tbody>
-
-
-    </table>
-
+      <DataGrid
+        rows={movements}
+        columns={columns}
+        disableRowSelectionOnClick
+        pageSizeOptions={[5, 10, 20]}
+        initialState={{
+          pagination: {
+            paginationModel: {
+              pageSize: 10,
+            },
+          },
+        }}
+      />
+    </div>
   );
-
 }

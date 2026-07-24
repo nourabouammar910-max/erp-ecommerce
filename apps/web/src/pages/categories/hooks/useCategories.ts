@@ -1,17 +1,31 @@
-import { useEffect, useState } from "react";
-import { categoriesApi } from "../api";
+import {
+useEffect,
+useState
+} from "react";
+
+
+import {
+categoriesApi
+} from "../api";
+
 
 
 export function useCategories(){
 
 
-const [categories,setCategories]=useState<any[]>([]);
+const [categories,setCategories]=
+useState<any[]>([]);
 
-const [loading,setLoading]=useState(false);
+
+const [loading,setLoading]=
+useState(false);
 
 
 
 async function refresh(){
+
+
+try{
 
 
 setLoading(true);
@@ -22,11 +36,30 @@ await categoriesApi.getAll();
 
 
 setCategories(
- res.data
+Array.isArray(res.data)
+?
+res.data
+:
+[]
 );
 
 
+
+}catch(error){
+
+console.log(
+"Categories Load Error",
+error
+);
+
+
+}finally{
+
+
 setLoading(false);
+
+
+}
 
 
 }

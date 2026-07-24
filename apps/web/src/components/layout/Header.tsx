@@ -6,22 +6,66 @@ export default function Header() {
   return (
     <header
       style={{
+        height: 70,
+        background: "#ffffff",
+        borderBottom: "1px solid #e5e7eb",
         display: "flex",
         justifyContent: "space-between",
-        padding: 20,
-        borderBottom: "1px solid #ddd",
+        alignItems: "center",
+        padding: "0 30px",
       }}
     >
-      <h2>ERP Dashboard</h2>
-
       <div>
-        <span>
-          {user?.name} ({user?.role})
-        </span>
+        <h2
+          style={{
+            fontSize: 24,
+            fontWeight: 700,
+            color: "#1e293b",
+          }}
+        >
+          ERP Dashboard
+        </h2>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 15,
+        }}
+      >
+        <div
+          style={{
+            textAlign: "right",
+          }}
+        >
+          <div
+            style={{
+              fontWeight: 600,
+            }}
+          >
+            {user?.name}
+          </div>
+
+          <div
+            style={{
+              color: "#64748b",
+              fontSize: 14,
+            }}
+          >
+            {user?.role}
+          </div>
+        </div>
 
         <button
-          style={{ marginLeft: 15 }}
           onClick={logout}
+          style={{
+            background: "#2563eb",
+            color: "#fff",
+            border: "none",
+            borderRadius: 8,
+            padding: "10px 18px",
+          }}
         >
           Logout
         </button>

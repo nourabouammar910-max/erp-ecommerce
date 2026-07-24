@@ -1,79 +1,72 @@
-import axios from "axios";
-
-
-const api = axios.create({
-
-  baseURL:"http://localhost:3000",
-
-});
-
+import api from "../../api/axios";
 
 
 export const inventoryApi = {
 
 
-  getAll(){
+getAll(){
 
-    return api.get("/inventory");
+return api.get("/inventory");
 
-  },
-
-
-
-  getProducts(){
-
-    return api.get("/inventory/products");
-
-  },
+},
 
 
 
-  getWarehouses(){
+getProducts(){
 
-    return api.get("/warehouses");
+return api.get("/products");
 
-  },
-
-
-
-  getMovements(){
-
-    return api.get("/inventory/movements");
-
-  },
+},
 
 
 
-  add(data:any){
+getWarehouses(){
 
-    return api.post(
-      "/inventory/add",
-      data
-    );
+return api.get("/warehouses");
 
-  },
+},
 
 
 
-  remove(data:any){
+getMovements(){
 
-    return api.post(
-      "/inventory/remove",
-      data
-    );
+return api.get("/inventory/movements");
 
-  },
+},
 
 
 
-  adjust(data:any){
+add(data:any){
 
-    return api.post(
-      "/inventory/adjust",
-      data
-    );
+return api.post(
+"/inventory/add",
+data
+);
 
-  }
+},
+
+
+
+remove(data:any){
+
+return api.post(
+"/inventory/remove",
+data
+);
+
+},
+
+
+
+adjust(data:any){
+
+return api.post(
+"/inventory/adjust",
+data
+);
+
+}
+
 
 
 };

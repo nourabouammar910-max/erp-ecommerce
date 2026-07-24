@@ -1,80 +1,100 @@
 import { useState } from "react";
 
+import {
+  Paper,
+  Stack,
+  Typography,
+  Button,
+} from "@mui/material";
+
+import { Add } from "@mui/icons-material";
+
+import SearchInput from "../../components/ui/SearchInput";
+import Loader from "../../components/ui/Loader";
+
 import { useUsers } from "./hooks/useUsers";
 import UsersTable from "./components/UsersTable";
 import UserModal from "./components/UserModal";
 
+export default function UsersPage() {
+  const { users, loading, refresh } = useUsers();
 
-export default function UsersPage(){
+  const [open, setOpen] = useState(false);
 
-  const {
-    users,
-    loading,
-    refresh
-  } = useUsers();
+  const [selectedUser, setSelectedUser] =
+    useState<any>(null);
 
+  const [search, setSearch] = useState("");
 
-  const [open,setOpen] =
-    useState(false);
-
+  const filteredUsers = users.filter((user: any) =>
+    user.name.toLowerCase().includes(search.toLowerCase()) ||
+    user.email.toLowerCase().includes(search.toLowerCase()) ||
+    user.role.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-
-    <div>
-
-      <div
-        style={{
-          display:"flex",
-          justifyContent:"space-between",
-          marginBottom:20
-        }}
+    <Paper
+      elevation={3}
+      sx={{
+        p: 3,
+        borderRadius: 3,
+      }}
+    >
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
       >
-
-        <h1>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+        >
           Users
-        </h1>
+        </Typography>
 
-
-        <button
-          onClick={()=>{
-            setOpen(true)
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={() => {
+            setSelectedUser(null);
+            setOpen(true);
           }}
         >
           Add User
-        </button>
+        </Button>
+      </Stack>
 
-
-      </div>
-
-
-
-      {
-        loading
-        ?
-        <p>
-          Loading...
-        </p>
-        :
-      <UsersTable
-  users={users}
-  refresh={refresh}
-/>
-      }
-
-
-
-      {
-        open &&
-        <UserModal
-          onClose={()=>{
-            setOpen(false)
-          }}
-          refresh={refresh}
+      <Stack mb={3}>
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder="Search by name, email or role..."
         />
-      }
+      </Stack>
 
+      {loading ? (
+        <Loader />
+      ) : (
+        <UsersTable
+          users={filteredUsers}
+          refresh={refresh}
+          onEdit={(user) => {
+            setSelectedUser(user);
+            setOpen(true);
+          }}
+        />
+      )}
 
-    </div>
-
+      <UserModal
+        open={open}
+        onClose={() => {
+          setOpen(false);
+          setSelectedUser(null);
+        }}
+        refresh={refresh}
+        user={selectedUser}
+      />
+    </Paper>
   );
 }

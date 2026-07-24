@@ -1,83 +1,278 @@
-interface Props{
- warehouses:any[];
- onEdit:(id:string)=>void;
- onDelete:(id:string)=>void;
+import {
+  DataGrid,
+  type GridColDef
+} from "@mui/x-data-grid";
+
+
+import {
+  Button,
+  Stack,
+  Tooltip
+} from "@mui/material";
+
+
+import {
+  Edit,
+  Delete
+} from "@mui/icons-material";
+
+
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
+
+
+import {
+  warehousesApi
+} from "../api";
+
+
+
+interface Props {
+
+  warehouses:any[];
+
+  refresh:()=>void|Promise<void>;
+
+  onEdit:(warehouse:any)=>void;
+
 }
 
 
+
 export default function WarehousesTable({
- warehouses,
- onEdit,
- onDelete
+
+warehouses,
+
+refresh,
+
+onEdit
+
 }:Props){
+
+
+
+async function remove(id:string|number){
+
+
+const result =
+await Swal.fire({
+
+title:"Delete Warehouse?",
+
+text:"This action cannot be undone",
+
+icon:"warning",
+
+showCancelButton:true,
+
+confirmButtonText:"Delete"
+
+});
+
+
+if(!result.isConfirmed)
+return;
+
+
+
+try{
+
+
+await warehousesApi.remove(
+String(id)
+);
+
+
+toast.success(
+"Warehouse deleted"
+);
+
+
+await refresh();
+
+
+}catch(error:any){
+
+
+toast.error(
+error?.response?.data?.message ??
+"Delete failed"
+);
+
+
+}
+
+
+}
+
+
+
+const columns:GridColDef[]=[
+
+
+{
+
+field:"id",
+
+headerName:"ID",
+
+width:80
+
+},
+
+
+{
+
+field:"name",
+
+headerName:"Warehouse",
+
+flex:1
+
+},
+
+
+
+{
+
+field:"actions",
+
+headerName:"Actions",
+
+width:220,
+
+sortable:false,
+
+
+renderCell:(params)=>(
+
+
+<Stack
+direction="row"
+spacing={1}
+>
+
+
+<Tooltip title="Edit">
+
+<Button
+
+variant="contained"
+
+size="small"
+
+startIcon={<Edit/>}
+
+onClick={()=>onEdit(params.row)}
+
+>
+
+Edit
+
+</Button>
+
+</Tooltip>
+
+
+
+<Tooltip title="Delete">
+
+<Button
+
+variant="contained"
+
+color="error"
+
+size="small"
+
+startIcon={<Delete/>}
+
+onClick={()=>
+remove(params.row.id)
+}
+
+>
+
+Delete
+
+</Button>
+
+
+</Tooltip>
+
+
+</Stack>
+
+
+)
+
+}
+
+
+];
+
 
 
 return (
 
-<table
-border={1}
-cellPadding={10}
+<div
+
+style={{
+
+height:600,
+
+width:"100%"
+
+}}
+
 >
 
 
-<thead>
-
-<tr>
-<th>ID</th>
-<th>Name</th>
-<th>Actions</th>
-</tr>
-
-</thead>
+<DataGrid
 
 
-<tbody>
-
-{
-warehouses.map(w=>(
-
-<tr key={w.id}>
+rows={warehouses}
 
 
-<td>
-{w.id}
-</td>
+columns={columns}
 
 
-<td>
-{w.name}
-</td>
+getRowId={(row)=>row.id}
 
 
-<td>
-
-<button
-onClick={()=>onEdit(w.id)}
->
-Edit
-</button>
+disableRowSelectionOnClick
 
 
-<button
-onClick={()=>onDelete(w.id)}
->
-Delete
-</button>
+
+pageSizeOptions={[
+5,
+10,
+20,
+50,
+100
+]}
 
 
-</td>
 
+initialState={{
 
-</tr>
+pagination:{
 
-))
+paginationModel:{
+
+pageSize:10
+
 }
 
+}
 
-</tbody>
+}}
 
 
-</table>
+/>
+
+
+</div>
 
 );
 

@@ -1,71 +1,140 @@
-interface Props {
-  items:any[];
+import {
+ DataGrid,
+ type GridColDef
+} from "@mui/x-data-grid";
+
+
+interface Props{
+
+items:any[];
+
 }
+
 
 
 export default function InventoryTable({
-  items
+
+items
+
 }:Props){
 
 
-return (
+const columns:GridColDef[]=[
 
-<table
-style={{
-width:"100%",
-borderCollapse:"collapse"
-}}
->
-
-<thead>
-
-<tr>
-
-<th>Product</th>
-
-<th>Warehouse</th>
-
-<th>Quantity</th>
-
-</tr>
-
-</thead>
-
-
-<tbody>
 
 {
-items.map(item=>(
 
-<tr key={item.id}>
+field:"product",
 
+headerName:"Product",
 
-<td>
-{item.product.name}
-</td>
+flex:1,
 
 
-<td>
-{item.warehouse.name}
-</td>
+valueGetter:(_,row)=>
+
+row.product?.name ??
+"Unknown"
 
 
-<td>
-{item.quantity}
-</td>
+},
 
 
-</tr>
 
-))
+{
+
+field:"warehouse",
+
+headerName:"Warehouse",
+
+flex:1,
+
+
+valueGetter:(_,row)=>
+
+row.warehouse?.name ??
+"Unknown"
+
+
+},
+
+
+
+{
+
+field:"quantity",
+
+headerName:"Quantity",
+
+width:150
+
 }
 
 
-</tbody>
+];
 
 
-</table>
 
+return(
+
+<div
+
+style={{
+
+height:500,
+
+width:"100%"
+
+}}
+
+>
+
+
+<DataGrid
+
+
+rows={items}
+
+
+columns={columns}
+
+
+getRowId={(row)=>row.id}
+
+
+disableRowSelectionOnClick
+
+
+pageSizeOptions={[
+5,
+10,
+20,
+50,
+100
+]}
+
+
+
+initialState={{
+
+pagination:{
+
+paginationModel:{
+
+pageSize:10
+
+}
+
+}
+
+}}
+
+
+
+/>
+
+
+</div>
 
 );
 

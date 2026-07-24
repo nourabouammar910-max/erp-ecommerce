@@ -1,162 +1,251 @@
-import { useState } from "react";
+import {
+useState
+} from "react";
+
 
 import {
-  useInventory
+
+Paper,
+
+Stack,
+
+Typography,
+
+Button
+
+}
+
+from "@mui/material";
+
+
+import {
+Add
+} from "@mui/icons-material";
+
+
+import Loader
+from "../../components/ui/Loader";
+
+
+import EmptyState
+from "../../components/ui/EmptyState";
+
+
+import {
+useInventory
 } from "./hooks/useInventory";
 
 
-import {
-  useDashboard
-} from "./hooks/useDashboard";
+import InventoryDashboard
+from "./components/InventoryDashboard";
 
 
-import InventoryTable from "./components/InventoryTable";
+import InventoryTable
+from "./components/InventoryTable";
 
-import AdjustStockModal from "./components/AdjustStockModal";
 
-import InventoryDashboard from "./components/InventoryDashboard";
+import AdjustStockModal
+from "./components/AdjustStockModal";
 
-import MovementsTable from "./components/MovementsTable";
 
-import {
-  useMovements
-} from "./hooks/useMovements";
+import MovementsTable
+from "./components/MovementsTable";
 
 
 
-export default function InventoryPage() {
+export default function InventoryPage(){
 
 
-  const {
-    items,
-    loading,
-    refresh
-  } = useInventory();
+const {
 
+items,
 
+loading,
 
-  const {
-    dashboard
-  } = useDashboard();
+refresh
 
+}=useInventory();
 
 
-  const {
-    movements
-  } = useMovements();
 
+const [open,setOpen]=useState(false);
 
 
-  const [open,setOpen] =
-    useState(false);
 
+const [selected,setSelected]=
+useState<any>(null);
 
 
-  return (
 
-    <div>
 
+return (
 
-      <h1>
-        Inventory
-      </h1>
+<Paper
 
+sx={{
 
+p:3,
 
-      <InventoryDashboard
-        dashboard={dashboard}
-      />
+borderRadius:3
 
+}}
 
+>
 
-      <div
-        style={{
-          display:"flex",
-          justifyContent:"space-between",
-          marginBottom:20,
-        }}
-      >
 
 
-        <h2>
-          Stock
-        </h2>
+<Typography
 
+variant="h4"
 
+fontWeight="bold"
 
-        <button
-          onClick={()=>
-            setOpen(true)
-          }
-        >
-          Adjust Stock
-        </button>
+mb={3}
 
+>
 
-      </div>
+Inventory
 
+</Typography>
 
 
 
 
-      {
-        loading ?
+<InventoryDashboard
+dashboard={{}}
+/>
 
-        <p>
-          Loading...
-        </p>
 
-        :
 
-        <InventoryTable
-          items={items}
-        />
 
-      }
 
+<Stack
 
+direction="row"
 
+justifyContent="space-between"
 
+mt={4}
 
+mb={2}
 
-      <h2
-        style={{
-          marginTop:40
-        }}
-      >
-        Stock Movements
-      </h2>
+>
 
 
+<Typography variant="h5">
 
-      <MovementsTable
-        movements={movements}
-      />
+Stock
 
+</Typography>
 
 
 
+<Button
 
+variant="contained"
 
-      {
-        open &&
+startIcon={<Add/>}
 
-        <AdjustStockModal
+onClick={()=>{
 
-          refresh={refresh}
+setSelected(null);
 
-          onClose={()=>
-            setOpen(false)
-          }
+setOpen(true);
 
-        />
+}}
 
-      }
+>
 
+Adjust Stock
 
+</Button>
 
-    </div>
 
-  );
+
+</Stack>
+
+
+
+
+{
+
+loading ?
+
+<Loader/>
+
+:
+
+items.length===0 ?
+
+<EmptyState text="No stock found"/>
+
+:
+
+<InventoryTable
+
+items={items}
+
+onAdjust={(item)=>{
+
+setSelected(item);
+
+setOpen(true);
+
+}}
+
+/>
+
+
+}
+
+
+
+
+<AdjustStockModal
+
+open={open}
+
+item={selected}
+
+refresh={refresh}
+
+onClose={()=>setOpen(false)}
+
+/>
+
+
+
+
+
+<Typography
+
+variant="h5"
+
+mt={5}
+
+mb={2}
+
+>
+
+Stock Movements
+
+</Typography>
+
+
+
+<MovementsTable
+
+movements={[]}
+
+/>
+
+
+
+
+</Paper>
+
+
+);
+
 
 }

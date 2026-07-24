@@ -1,44 +1,94 @@
-import { useEffect, useState } from "react";
-import { warehousesApi } from "../api";
+import {
+  useEffect,
+  useState
+} from "react";
+
+
+import {
+  warehousesApi
+} from "../api";
+
 
 
 export function useWarehouses(){
 
-const [warehouses,setWarehouses]=useState<any[]>([]);
-const [loading,setLoading]=useState(false);
+
+const [warehouses,setWarehouses] =
+useState<any[]>([]);
+
+
+
+const [loading,setLoading] =
+useState(false);
+
+
 
 
 async function refresh(){
 
+
 try{
+
 
 setLoading(true);
 
-const res = await warehousesApi.getAll();
-
-setWarehouses(res.data);
 
 
-}catch(error){
+const res =
+await warehousesApi.getAll();
+
+
+
+setWarehouses(
+
+Array.isArray(res.data)
+
+?
+res.data
+
+:
+
+[]
+
+);
+
+
+
+}
+
+catch(error){
+
 
 console.log(
-"LOAD WAREHOUSES ERROR",
+"Warehouses Load Error:",
 error
 );
 
 
-}finally{
+setWarehouses([]);
+
+
+}
+
+finally{
+
 
 setLoading(false);
 
-}
 
 }
+
+
+}
+
+
 
 
 useEffect(()=>{
 
+
 refresh();
+
 
 },[]);
 
@@ -46,11 +96,15 @@ refresh();
 
 return {
 
+
 warehouses,
+
 
 loading,
 
+
 refresh
+
 
 };
 

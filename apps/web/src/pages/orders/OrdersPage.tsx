@@ -1,300 +1,225 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import api from "../../api/axios";
+import {
+useState
+} from "react";
 
 
-interface OrderItem {
-  id: number;
-  quantity: number;
-  price: number;
-  productId: string;
+import {
+
+Paper,
+
+Stack,
+
+Typography,
+
+Button
+
+}
+
+from "@mui/material";
+
+
+import {
+Add
+} from "@mui/icons-material";
+
+
+
+import Loader
+from "../../components/ui/Loader";
+
+
+import EmptyState
+from "../../components/ui/EmptyState";
+
+
+
+import {
+useOrders
+} from "./hooks/useOrders";
+
+
+
+import OrdersTable
+from "./components/OrdersTable";
+
+
+import OrderForm
+from "./components/OrderForm";
+
+
+
+
+export default function OrdersPage(){
+
+
+const {
+
+orders,
+
+loading,
+
+refresh
+
+}=useOrders();
+
+
+
+
+const [
+open,
+setOpen
+]=useState(false);
+
+
+
+
+const [
+selected,
+setSelected
+]=useState<any>(null);
+
+
+
+
+
+
+return (
+
+<Paper
+
+sx={{
+
+p:3,
+
+borderRadius:3
+
+}}
+
+>
+
+
+
+<Stack
+
+direction="row"
+
+justifyContent="space-between"
+
+alignItems="center"
+
+mb={3}
+
+>
+
+
+
+<Typography
+
+variant="h4"
+
+fontWeight="bold"
+
+>
+
+Orders
+
+</Typography>
+
+
+
+
+<Button
+
+variant="contained"
+
+startIcon={<Add/>}
+
+onClick={()=>{
+
+setSelected(null);
+
+setOpen(true);
+
+}}
+
+>
+
+New Order
+
+</Button>
+
+
+
+
+</Stack>
+
+
+
+
+
+{
+
+loading ?
+
+<Loader/>
+
+:
+
+orders.length===0 ?
+
+<EmptyState
+
+text="No orders found"
+
+/>
+
+:
+
+<OrdersTable
+
+orders={orders}
+
+refresh={refresh}
+
+onEdit={(order)=>{
+
+setSelected(order);
+
+setOpen(true);
+
+}}
+
+/>
+
+
+
 }
 
 
-interface Order {
-  id: number;
-  total: number;
 
-  user?: {
-    name: string;
-    email: string;
-  };
 
-  warehouse?: {
-    name: string;
-  };
 
-  items: OrderItem[];
-}
 
+<OrderForm
 
+open={open}
 
-export default function OrdersPage() {
+onClose={()=>setOpen(false)}
 
+refresh={refresh}
 
-  const [orders, setOrders] = useState<Order[]>([]);
+order={selected}
 
-  const [loading, setLoading] =
-    useState(true);
+/>
 
 
 
-  useEffect(() => {
 
-    loadOrders();
 
-  }, []);
+</Paper>
 
 
-
-  async function loadOrders() {
-  try {
-    const res = await api.get("/orders");
-
-    console.log("SUCCESS:", res.data);
-
-    setOrders(res.data);
-  } catch (err: any) {
-    console.log("STATUS:", err.response?.status);
-    console.log("DATA:", err.response?.data);
-    console.log("ERROR:", err);
-
-    setOrders([]);
-  } finally {
-    setLoading(false);
-  }
-}
-
-
-
-
-
-  if(loading){
-
-    return (
-
-      <div style={{padding:20}}>
-
-        Loading orders...
-
-      </div>
-
-    );
-
-  }
-
-
-
-
-
-  return (
-
-
-    <div style={{padding:20}}>
-
-
-      <div
-        style={{
-          display:"flex",
-          justifyContent:"space-between",
-          alignItems:"center"
-        }}
-      >
-
-
-        <h1>
-          Orders
-        </h1>
-
-
-
-        <Link to="/orders/create">
-
-          <button>
-            + Create Order
-          </button>
-
-        </Link>
-
-
-      </div>
-
-
-
-
-
-      {
-        orders.length === 0 && (
-
-          <p>
-            No orders found
-          </p>
-
-        )
-      }
-
-
-
-
-
-
-      {
-        orders.length > 0 && (
-
-
-        <table
-
-          border={1}
-
-          cellPadding={10}
-
-          style={{
-            marginTop:20,
-            width:"100%",
-            borderCollapse:"collapse"
-          }}
-
-        >
-
-
-          <thead>
-
-            <tr>
-
-
-              <th>
-                ID
-              </th>
-
-
-              <th>
-                Customer
-              </th>
-
-
-              <th>
-                Warehouse
-              </th>
-
-
-              <th>
-                Items
-              </th>
-
-
-              <th>
-                Total
-              </th>
-
-
-            </tr>
-
-
-          </thead>
-
-
-
-
-
-          <tbody>
-
-
-          {
-            orders.map(order=>(
-
-
-              <tr key={order.id}>
-
-
-                <td>
-                  #{order.id}
-                </td>
-
-
-
-                <td>
-
-                  {order.user?.name}
-
-                  <br />
-
-                  <small>
-                    {order.user?.email}
-                  </small>
-
-                </td>
-
-
-
-
-                <td>
-
-                  {
-                    order.warehouse?.name
-                    ||
-                    "-"
-                  }
-
-                </td>
-
-
-
-
-
-                <td>
-
-                  {
-                    order.items?.length
-                    ||
-                    0
-                  }
-
-                  {" "}products
-
-                </td>
-
-
-
-
-
-                <td>
-
-                  $
-                  {
-                    order.total
-                  }
-
-                </td>
-
-
-
-
-              </tr>
-
-
-            ))
-          }
-
-
-
-          </tbody>
-
-
-
-        </table>
-
-
-        )
-
-      }
-
-
-
-
-    </div>
-
-
-  );
+);
 
 
 }

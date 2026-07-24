@@ -21,6 +21,7 @@ import { PurchaseModule } from './purchase/purchase.module';
 import { WarehousesModule } from './warehouses/warehouses.module';
 
 import { SuppliersModule } from './suppliers/suppliers.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 
 @Module({
@@ -56,6 +57,9 @@ import { SuppliersModule } from './suppliers/suppliers.module';
 
 
     SuppliersModule,
+
+
+    DashboardModule,
 
   ],
 

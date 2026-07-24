@@ -1,18 +1,50 @@
-import { Navigate } from "react-router-dom";
+import {
+Navigate
+} from "react-router-dom";
 
-interface Props {
-  children: React.ReactNode;
-}
+
+import {
+useAuth
+} from "../hooks/useAuth";
+
+
 
 export default function ProtectedRoute({
-  children,
-}: Props) {
+children
+}:{
+children:React.ReactNode
+}){
 
-  const token = localStorage.getItem("access_token");
 
-  if (!token) {
-    return <Navigate to="/" replace />;
-  }
+const {
+user,
+loading
+}=useAuth();
 
-  return <>{children}</>;
+
+
+if(loading){
+
+return null;
+
+}
+
+
+
+if(!user){
+
+return (
+<Navigate
+to="/"
+replace
+/>
+);
+
+}
+
+
+
+return children;
+
+
 }

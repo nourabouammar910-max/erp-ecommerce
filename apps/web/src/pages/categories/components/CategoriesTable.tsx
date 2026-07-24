@@ -1,122 +1,331 @@
-import { useNavigate } from "react-router-dom";
+import {
+  DataGrid,
+  type GridColDef,
+} from "@mui/x-data-grid";
+
+import {
+  Button,
+  Chip,
+  Stack,
+  Tooltip,
+} from "@mui/material";
+
+import {
+  Edit,
+  Delete,
+} from "@mui/icons-material";
+
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
+
+import { categoriesApi } from "../api";
+
+
+interface Props {
+
+  categories:any[];
+
+  refresh:()=>void | Promise<void>;
+
+  onEdit:(category:any)=>void;
+
+}
+
 
 
 export default function CategoriesTable({
-categories,
-refresh
-}:any){
+
+  categories,
+
+  refresh,
+
+  onEdit
+
+}:Props){
 
 
-const navigate =
-useNavigate();
+
+async function remove(id:number|string){
+
+
+const result = await Swal.fire({
+
+title:"Delete Category?",
+
+text:"This action cannot be undone.",
+
+icon:"warning",
+
+showCancelButton:true,
+
+confirmButtonText:"Delete",
+
+cancelButtonText:"Cancel"
+
+});
 
 
 
-async function remove(id:number){
+if(!result.isConfirmed)
+return;
 
 
-await fetch(
-`http://localhost:3000/categories/${id}`,
-{
-method:"DELETE"
-}
+
+try{
+
+
+await categoriesApi.remove(id);
+
+
+toast.success(
+"Category deleted successfully"
 );
 
 
-refresh();
+await refresh();
+
+
 
 }
+catch(err:any){
+
+
+toast.error(
+err?.response?.data?.message ??
+"Delete failed"
+);
+
+
+}
+
+
+}
+
+
+
+
+
+const columns:GridColDef[]=[
+
+
+
+{
+field:"id",
+
+headerName:"ID",
+
+width:90
+
+},
+
+
+
+{
+field:"name",
+
+headerName:"Category",
+
+flex:1,
+
+minWidth:200
+
+},
+
+
+
+{
+field:"products",
+
+headerName:"Products",
+
+width:150,
+
+
+renderCell:(params)=>(
+
+<Chip
+
+label={
+params.row.products?.length ?? 0
+}
+
+color="primary"
+
+size="small"
+
+/>
+
+)
+
+},
+
+
+
+{
+field:"actions",
+
+headerName:"Actions",
+
+width:220,
+
+sortable:false,
+
+filterable:false,
+
+
+renderCell:(params)=>(
+
+
+<Stack
+
+direction="row"
+
+spacing={1}
+
+>
+
+
+<Tooltip title="Edit">
+
+<Button
+
+variant="contained"
+
+size="small"
+
+startIcon={<Edit/>}
+
+onClick={()=>
+onEdit(params.row)
+}
+
+>
+
+Edit
+
+</Button>
+
+
+</Tooltip>
+
+
+
+
+<Tooltip title="Delete">
+
+<Button
+
+color="error"
+
+variant="contained"
+
+size="small"
+
+startIcon={<Delete/>}
+
+onClick={()=>
+remove(params.row.id)
+}
+
+>
+
+Delete
+
+</Button>
+
+
+</Tooltip>
+
+
+</Stack>
+
+
+)
+
+
+}
+
+
+];
+
+
 
 
 
 return (
 
-<table
+<div
+
 style={{
+
+height:600,
+
 width:"100%"
+
 }}
+
 >
 
 
-<thead>
+<DataGrid
 
-<tr>
 
-<th>ID</th>
+rows={categories}
 
-<th>Name</th>
 
-<th>Products</th>
+columns={columns}
 
-<th>Actions</th>
 
-</tr>
+getRowId={(row)=>row.id}
 
-</thead>
+
+disableRowSelectionOnClick
 
 
 
-<tbody>
+pageSizeOptions={[
 
+5,
 
-{
-categories.map((cat:any)=>(
+10,
 
-<tr key={cat.id}>
+20,
 
+50,
 
-<td>
-{cat.id}
-</td>
+100
 
-
-<td>
-{cat.name}
-</td>
-
-
-<td>
-{cat.products?.length || 0}
-</td>
-
-
-<td>
-
-
-<button
-onClick={()=>
-navigate(
-`/categories/${cat.id}/edit`
-)
-}
->
-Edit
-</button>
+]}
 
 
 
-<button
-onClick={()=>
-remove(cat.id)
-}
->
-Delete
-</button>
+initialState={{
 
+pagination:{
 
-</td>
+paginationModel:{
 
+pageSize:10
 
-</tr>
-
-))
 }
 
+}
 
-</tbody>
+}}
 
 
-</table>
+
+sx={{
+
+borderRadius:3
+
+}}
+
+
+/>
+
+
+</div>
 
 );
 

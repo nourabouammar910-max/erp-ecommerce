@@ -1,78 +1,179 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+
+import {
+  Paper,
+  Stack,
+  Typography,
+  Button,
+} from "@mui/material";
+
+import { Add } from "@mui/icons-material";
+
+import SearchInput from "../../components/ui/SearchInput";
+import Loader from "../../components/ui/Loader";
+import EmptyState from "../../components/ui/EmptyState";
+
 import { useWarehouses } from "./hooks/useWarehouses";
-import { warehousesApi } from "./api";
+
 import WarehousesTable from "./components/WarehousesTable";
+import WarehouseForm from "./components/WarehouseForm";
 
 
-export default function WarehousesPage(){
+export default function WarehousesPage() {
 
-const navigate=useNavigate();
-
-
-const {
- warehouses,
- loading,
- refresh
-}=useWarehouses();
+  const {
+    warehouses,
+    loading,
+    refresh,
+  } = useWarehouses();
 
 
-
-async function remove(id:string){
-
-await warehousesApi.remove(id);
-
-refresh();
-
-}
+  const [open,setOpen] = useState(false);
 
 
-
-return (
-
-<div>
-
-
-<h1>
-Warehouses
-</h1>
+  const [
+    selectedWarehouse,
+    setSelectedWarehouse
+  ] = useState<any>(null);
 
 
-<button
-onClick={()=>
-navigate("/warehouses/create")
-}
->
-Add Warehouse
-</button>
+  const [search,setSearch] = useState("");
 
 
-{
-loading ?
 
-<p>
-Loading...
-</p>
+  const filteredWarehouses =
+    warehouses.filter((warehouse:any)=>{
 
-:
-
-<WarehousesTable
-
-warehouses={warehouses}
-
-onEdit={
-(id)=>
-navigate(`/warehouses/${id}/edit`)
-}
-
-onDelete={remove}
-
-/>
-
-}
+      const keyword =
+        search.toLowerCase();
 
 
-</div>
+      return (
+        warehouse.name
+        ?.toLowerCase()
+        .includes(keyword)
+      );
 
-);
+    });
+
+
+
+  return (
+
+    <Paper
+      elevation={3}
+      sx={{
+        p:3,
+        borderRadius:3
+      }}
+    >
+
+
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
+
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+        >
+          Warehouses
+        </Typography>
+
+
+
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={()=>{
+
+            setSelectedWarehouse(null);
+
+            setOpen(true);
+
+          }}
+        >
+
+          Add Warehouse
+
+        </Button>
+
+
+      </Stack>
+
+
+
+      <Stack mb={3}>
+
+        <SearchInput
+
+          value={search}
+
+          onChange={setSearch}
+
+          placeholder="Search warehouses..."
+
+        />
+
+      </Stack>
+
+
+
+
+      {
+        loading ?
+
+        <Loader/>
+
+        :
+
+        filteredWarehouses.length === 0 ?
+
+        <EmptyState
+          text="No warehouses found"
+        />
+
+        :
+
+        <WarehousesTable
+
+          warehouses={filteredWarehouses}
+
+          refresh={refresh}
+
+          onEdit={(warehouse)=>{
+
+            setSelectedWarehouse(warehouse);
+
+            setOpen(true);
+
+          }}
+
+        />
+
+      }
+
+
+
+      <WarehouseForm
+
+        open={open}
+
+        onClose={()=>setOpen(false)}
+
+        refresh={refresh}
+
+        warehouse={selectedWarehouse}
+
+      />
+
+
+
+    </Paper>
+
+  );
 
 }

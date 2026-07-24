@@ -1,189 +1,185 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  MenuItem,
+  Stack,
+  CircularProgress,
+} from "@mui/material";
+
+import toast from "react-hot-toast";
 import { usersApi } from "../api";
 
-
 interface Props {
+  open: boolean;
   onClose: () => void;
   refresh: () => void;
+  user?: any;
 }
 
-
 export default function UserModal({
+  open,
   onClose,
-  refresh
+  refresh,
+  user,
 }: Props) {
-
-
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "USER",
+  });
+
+  useEffect(() => {
+    if (user) {
+      setForm({
+        name: user.name,
+        email: user.email,
+        password: "",
+        role: user.role,
+      });
+    } else {
+      setForm({
+        name: "",
+        email: "",
+        password: "",
+        role: "USER",
+      });
+    }
+  }, [user, open]);
 
   async function save() {
-
     try {
-
       setLoading(true);
-      setError("");
 
-      await usersApi.create({
-        name,
-        email,
-        password
-      });
+      const payload: any = {
+        name: form.name,
+        email: form.email,
+        role: form.role,
+      };
 
+      if (form.password.trim() !== "") {
+        payload.password = form.password;
+      }
+
+      if (user) {
+        await usersApi.update(user.id, payload);
+        toast.success("User updated successfully");
+      } else {
+        await usersApi.create(payload);
+        toast.success("User created successfully");
+      }
 
       refresh();
       onClose();
-
-
-    } catch (err:any) {
-
-      setError(
-        err?.response?.data?.message ||
-        "Failed to create user"
+    } catch (err: any) {
+      toast.error(
+        err?.response?.data?.message || "Operation failed"
       );
-
     } finally {
-
       setLoading(false);
-
     }
-
   }
 
-
-
   return (
-
-    <div
-      style={{
-        position:"fixed",
-        top:0,
-        left:0,
-        right:0,
-        bottom:0,
-        background:"#0005",
-        display:"grid",
-        placeItems:"center",
-        zIndex:1000
-      }}
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="sm"
     >
+      <DialogTitle>
+        {user ? "Edit User" : "Create User"}
+      </DialogTitle>
 
-
-      <div
-        style={{
-          background:"#fff",
-          padding:30,
-          width:350,
-          borderRadius:10
-        }}
-      >
-
-
-        <h2>
-          Create User
-        </h2>
-
-
-
-        {
-          error &&
-          <p style={{color:"red"}}>
-            {error}
-          </p>
-        }
-
-
-
-        <input
-          placeholder="Name"
-          value={name}
-          onChange={
-            e=>setName(e.target.value)
-          }
-          style={{
-            width:"100%",
-            padding:10,
-            marginBottom:10
-          }}
-        />
-
-
-
-        <input
-          placeholder="Email"
-          type="email"
-          value={email}
-          onChange={
-            e=>setEmail(e.target.value)
-          }
-          style={{
-            width:"100%",
-            padding:10,
-            marginBottom:10
-          }}
-        />
-
-
-
-        <input
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={
-            e=>setPassword(e.target.value)
-          }
-          style={{
-            width:"100%",
-            padding:10,
-            marginBottom:20
-          }}
-        />
-
-
-
-        <div
-          style={{
-            display:"flex",
-            gap:10
-          }}
-        >
-
-
-          <button
-            onClick={save}
-            disabled={loading}
-          >
-            {
-              loading
-              ? "Saving..."
-              : "Save"
+      <DialogContent>
+        <Stack spacing={2} mt={2}>
+          <TextField
+            label="Name"
+            value={form.name}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                name: e.target.value,
+              })
             }
-          </button>
+            fullWidth
+          />
 
+          <TextField
+            label="Email"
+            value={form.email}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                email: e.target.value,
+              })
+            }
+            fullWidth
+          />
 
+          <TextField
+            label={
+              user
+                ? "New Password (optional)"
+                : "Password"
+            }
+            type="password"
+            value={form.password}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                password: e.target.value,
+              })
+            }
+            fullWidth
+          />
 
-          <button
-            onClick={onClose}
-            disabled={loading}
+          <TextField
+            select
+            label="Role"
+            value={form.role}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                role: e.target.value,
+              })
+            }
+            fullWidth
           >
-            Cancel
-          </button>
+            <MenuItem value="ADMIN">ADMIN</MenuItem>
+            <MenuItem value="EMPLOYEE">EMPLOYEE</MenuItem>
+            <MenuItem value="USER">USER</MenuItem>
+          </TextField>
+        </Stack>
+      </DialogContent>
 
+      <DialogActions>
+        <Button onClick={onClose}>
+          Cancel
+        </Button>
 
-        </div>
-
-
-
-      </div>
-
-
-    </div>
-
+        <Button
+          variant="contained"
+          onClick={save}
+          disabled={loading}
+        >
+          {loading ? (
+            <CircularProgress size={22} />
+          ) : user ? (
+            "Update"
+          ) : (
+            "Create"
+          )}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
-
 }

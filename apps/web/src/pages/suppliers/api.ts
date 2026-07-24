@@ -1,27 +1,65 @@
-import axios from "axios";
+import api from "../../api/axios";
 
-const API = "http://localhost:3000/suppliers";
+
+const API = "/suppliers";
+
+
 
 export const suppliersApi = {
 
-  getAll() {
-    return axios.get(API);
-  },
 
-  getOne(id: string) {
-    return axios.get(`${API}/${id}`);
-  },
 
-  create(data: any) {
-    return axios.post(API, data);
-  },
+getAll(){
 
-  update(id: string, data: any) {
-    return axios.patch(`${API}/${id}`, data);
-  },
+return api.get(API);
 
-  remove(id: string) {
-    return axios.delete(`${API}/${id}`);
-  },
+},
+
+
+
+getOne(id:string | number){
+
+return api.get(
+`${API}/${id}`
+);
+
+},
+
+
+
+create(data:any){
+
+return api.post(
+API,
+data
+);
+
+},
+
+
+
+update(
+id:string | number,
+data:any
+){
+
+return api.patch(
+`${API}/${id}`,
+data
+);
+
+},
+
+
+
+remove(id:string | number){
+
+return api.delete(
+`${API}/${id}`
+);
+
+},
+
+
 
 };

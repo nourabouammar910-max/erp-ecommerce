@@ -1,123 +1,40 @@
-import {
-  Outlet,
-  Link
-} from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import Box from "@mui/material/Box";
 
+import Sidebar from "../components/layout/Sidebar";
+import Header from "../components/layout/Header";
 
 export default function DashboardLayout() {
-
-
   return (
-
-    <div
-      style={{
-        display:"flex",
-        minHeight:"100vh",
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        bgcolor: "#f8fafc",
       }}
     >
+      <Sidebar />
 
-
-      <aside
-        style={{
-          width:220,
-          padding:20,
-          borderRight:"1px solid #ddd",
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
+        <Header />
 
-
-        <h2>
-          ERP
-        </h2>
-
-
-
-        <nav
-          style={{
-            display:"flex",
-            flexDirection:"column",
-            gap:15,
+        <Box
+          component="main"
+          sx={{
+            flex: 1,
+            p: 3,
+            overflowY: "auto",
           }}
         >
-
-
-          <Link to="/dashboard">
-            Dashboard
-          </Link>
-
-
-
-          <Link to="/users">
-            Users
-          </Link>
-
-
-
-          <Link to="/products">
-            Products
-          </Link>
-
-
-
-          <Link to="/categories">
-            Categories
-          </Link>
-
-
-
-          <Link to="/inventory">
-            Inventory
-          </Link>
-
-
-
-          <Link to="/warehouses">
-            Warehouses
-          </Link>
-
-
-
-          <Link to="/suppliers">
-            Suppliers
-          </Link>
-
-
-
-          <Link to="/orders">
-            Orders
-          </Link>
-
-
-
-          <Link to="/purchases">
-            Purchases
-          </Link>
-
-
-        </nav>
-
-
-      </aside>
-
-
-
-
-
-      <main
-        style={{
-          flex:1,
-          padding:30,
-        }}
-      >
-
-        <Outlet />
-
-      </main>
-
-
-
-    </div>
-
+          <Outlet />
+        </Box>
+      </Box>
+    </Box>
   );
-
 }

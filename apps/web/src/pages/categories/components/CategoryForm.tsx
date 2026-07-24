@@ -1,71 +1,354 @@
-import { useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+
+import {
+
+Dialog,
+
+DialogTitle,
+
+DialogContent,
+
+DialogActions,
+
+Button,
+
+TextField,
+
+CircularProgress
+
+} from "@mui/material";
+
+
+import toast from "react-hot-toast";
+
+
+import {
+ categoriesApi
+} from "../api";
+
 
 
 interface Props {
 
-initial?:any;
+open:boolean;
 
-onSubmit:(data:any)=>void;
+onClose:()=>void;
+
+refresh:()=>void | Promise<void>;
+
+category?:any;
 
 }
 
 
 
 export default function CategoryForm({
-initial,
-onSubmit
+
+open,
+
+onClose,
+
+refresh,
+
+category
+
 }:Props){
 
 
-const [name,setName]=useState(
- initial?.name || ""
+
+const [loading,setLoading]=
+useState(false);
+
+
+
+const [name,setName]=
+useState("");
+
+
+
+
+
+useEffect(()=>{
+
+
+setName(
+category?.name ?? ""
+);
+
+
+},[category,open]);
+
+
+
+
+
+
+
+async function save(){
+
+
+
+if(!name.trim()){
+
+
+toast.error(
+"Category name is required"
+);
+
+
+return;
+
+
+}
+
+
+
+try{
+
+
+setLoading(true);
+
+
+
+const data={
+
+name:name.trim()
+
+};
+
+
+
+
+
+if(category){
+
+
+await categoriesApi.update(
+
+category.id,
+
+data
+
 );
 
 
 
-function submit(e:any){
+toast.success(
+"Category updated successfully"
+);
 
-e.preventDefault();
 
 
-onSubmit({
- name
-});
+}
+
+else{
+
+
+await categoriesApi.create(
+
+data
+
+);
+
+
+
+toast.success(
+"Category created successfully"
+);
+
 
 
 }
 
 
 
-return (
-
-<form onSubmit={submit}>
 
 
-<input
+await refresh();
 
-placeholder="Category name"
+
+
+setName("");
+
+
+
+onClose();
+
+
+
+}
+
+catch(err:any){
+
+
+
+toast.error(
+
+err?.response?.data?.message ??
+
+"Operation failed"
+
+);
+
+
+
+}
+
+finally{
+
+
+setLoading(false);
+
+
+}
+
+
+
+}
+
+
+
+
+
+return(
+
+
+<Dialog
+
+open={open}
+
+onClose={
+loading ? undefined : onClose
+}
+
+fullWidth
+
+maxWidth="sm"
+
+>
+
+
+
+<DialogTitle>
+
+
+{
+category ?
+
+"Edit Category"
+
+:
+
+"Create Category"
+
+}
+
+
+</DialogTitle>
+
+
+
+<DialogContent>
+
+
+<TextField
+
+
+fullWidth
+
+
+sx={{
+mt:2
+}}
+
+
+label="Category Name"
+
 
 value={name}
 
-onChange={
-e=>setName(e.target.value)
+
+onChange={(e)=>
+setName(e.target.value)
 }
+
+
 
 />
 
 
-<br/>
+
+</DialogContent>
 
 
-<button>
-
-Save
-
-</button>
 
 
-</form>
+<DialogActions>
+
+
+<Button
+
+disabled={loading}
+
+onClick={onClose}
+
+>
+
+Cancel
+
+</Button>
+
+
+
+
+
+<Button
+
+variant="contained"
+
+disabled={loading}
+
+onClick={save}
+
+>
+
+
+
+{
+loading ?
+
+<CircularProgress size={22}/>
+
+
+:
+
+category ?
+
+"Update"
+
+:
+
+"Create"
+
+}
+
+
+
+</Button>
+
+
+
+</DialogActions>
+
+
+
+
+</Dialog>
+
 
 );
 

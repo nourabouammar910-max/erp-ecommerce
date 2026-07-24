@@ -1,24 +1,68 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState
+} from "react";
 
-import { suppliersApi } from "../api";
+import {
+  suppliersApi
+} from "../api";
+
 
 export function useSuppliers() {
 
-  const [suppliers, setSuppliers] = useState<any[]>([]);
 
-  const [loading, setLoading] = useState(false);
+  const [suppliers, setSuppliers] =
+    useState<any[]>([]);
+
+
+  const [loading, setLoading] =
+    useState(false);
+
+
 
   async function refresh() {
 
-    setLoading(true);
+    try {
 
-    const res = await suppliersApi.getAll();
+      setLoading(true);
 
-    setSuppliers(res.data);
 
-    setLoading(false);
+      const res =
+        await suppliersApi.getAll();
+
+
+
+      setSuppliers(
+        Array.isArray(res.data)
+          ? res.data
+          : []
+      );
+
+
+
+    } catch (error) {
+
+
+      console.log(
+        "Suppliers Load Error:",
+        error
+      );
+
+
+      setSuppliers([]);
+
+
+    } finally {
+
+
+      setLoading(false);
+
+
+    }
 
   }
+
+
 
   useEffect(() => {
 
@@ -26,14 +70,17 @@ export function useSuppliers() {
 
   }, []);
 
+
+
   return {
 
     suppliers,
 
     loading,
 
-    refresh,
+    refresh
 
   };
+
 
 }
